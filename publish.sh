@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-npx -y uglify-js nanosheets.js -o nanosheets.min.js
+npx -y uglify-js nanosheets.js -m -o nanosheets.min.js
 gzip -k -f nanosheets.min.js
 git add .
 git commit -m "build"

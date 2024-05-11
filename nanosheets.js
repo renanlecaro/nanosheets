@@ -8,18 +8,18 @@ export function NanoSheets(
         style = ({x, y, value, selected}) => ({
             padding: "0 10px",
             borderBottom: "1px solid #dadada",
-            borderRight:'1px solid #dadada',
+            borderRight: '1px solid #dadada',
             background: selected ? '#e2f7ff' : 'white',
             transition: 'background 0.1s',
             color: 'black',
-            outline:'none',
-            whiteSpace:'nowrap'
+            outline: 'none',
+            whiteSpace: 'nowrap'
         }),
         defaultValue = ({x, y}) => ''
     },
 ) {
 
-    Object.assign(node.style, {overflow: "auto", position: "relative", border:'1px solid #dadada'});
+    Object.assign(node.style, {overflow: "auto", position: "relative", border: '1px solid #dadada'});
     // // The node itself shouldn't get focus, despite being scrollable and clickable
     node.setAttribute('tabindex', '-1')
 
@@ -39,14 +39,14 @@ export function NanoSheets(
     input.setAttribute("type", "search");
     Object.assign(input.style, {
         zIndex: 2,
-        font:'inherit',
+        font: 'inherit',
         lineHeight: cellHeight + 'px',
         width: cellWidth + "px",
         height: cellHeight + "px",
         position: "absolute",
         boxSizing: 'border-box',
-        border:'2px solid #00aae1',
-        borderRadius:'2px',
+        border: '2px solid #00aae1',
+        borderRadius: '2px',
         transition: 'left 0.2s, top 0.2s',
         padding: '0 8px',
     })
@@ -181,7 +181,7 @@ export function NanoSheets(
         input,
         "keydown",
         (e) => {
-            console.log(e.key)
+
             const [x, y] = cellXY(editing);
 
             const allCells = Object.keys(data).map(cell => cellXY(cell))
@@ -229,9 +229,9 @@ export function NanoSheets(
     listen(
         input,
         "input", (e) => {
-            console.log('input',e)
+
             if (!editActive && input.value) {
-            const [x, y] = cellXY(editing);
+                const [x, y] = cellXY(editing);
                 const tmp = input.value
                 startEditing(x, y);
                 input.value = tmp
@@ -284,9 +284,9 @@ export function NanoSheets(
 
     let lastClick = 0;
     listen(node, "mousedown", (e) => {
-
+        
         const cell = e.target.getAttribute("cell");
-        if (!cell) return
+        if (!cell || e.buttons !== 1) return
         e.preventDefault();
 
         const [x, y] = cellXY(cell);
@@ -383,96 +383,100 @@ export function NanoSheets(
         redraw,
         data,
     };
-}
 
-// from https://github.com/warpech/sheetclip/blob/master/sheetclip.js
+    // Functions declared here will be hoisted above while making it clear to uglify-js that
+    // they are private
 
-function countQuotes(str) {
-    return str.split('"').length - 1;
-}
 
-function parseArrayString(str) {
-    let r,
-        rlen,
-        rows,
-        arr = [],
-        a = 0,
-        c,
-        clen,
-        multiline,
-        last;
-    rows = str.split("\n");
-    if (rows.length > 1 && rows[rows.length - 1] === "") {
-        rows.pop();
+    // from https://github.com/warpech/sheetclip/blob/master/sheetclip.js
+    function countQuotes(str) {
+        return str.split('"').length - 1;
     }
-    for (r = 0, rlen = rows.length; r < rlen; r += 1) {
-        rows[r] = rows[r].split("\t");
-        for (c = 0, clen = rows[r].length; c < clen; c += 1) {
-            if (!arr[a]) {
-                arr[a] = [];
-            }
-            if (multiline && c === 0) {
-                last = arr[a].length - 1;
-                arr[a][last] = arr[a][last] + "\n" + rows[r][0];
-                if (multiline && countQuotes(rows[r][0]) & 1) {
-                    //& 1 is a bitwise way of performing mod 2
-                    multiline = false;
-                    arr[a][last] = arr[a][last]
-                        .substring(0, arr[a][last].length - 1)
-                        .replace(/""/g, '"');
+
+    function parseArrayString(str) {
+        let r,
+            rlen,
+            rows,
+            arr = [],
+            a = 0,
+            c,
+            clen,
+            multiline,
+            last;
+        rows = str.split("\n");
+        if (rows.length > 1 && rows[rows.length - 1] === "") {
+            rows.pop();
+        }
+        for (r = 0, rlen = rows.length; r < rlen; r += 1) {
+            rows[r] = rows[r].split("\t");
+            for (c = 0, clen = rows[r].length; c < clen; c += 1) {
+                if (!arr[a]) {
+                    arr[a] = [];
                 }
-            } else {
-                if (
-                    c === clen - 1 &&
-                    rows[r][c].indexOf('"') === 0 &&
-                    countQuotes(rows[r][c]) & 1
-                ) {
-                    arr[a].push(rows[r][c].substring(1).replace(/""/g, '"'));
-                    multiline = true;
+                if (multiline && c === 0) {
+                    last = arr[a].length - 1;
+                    arr[a][last] = arr[a][last] + "\n" + rows[r][0];
+                    if (multiline && countQuotes(rows[r][0]) & 1) {
+                        //& 1 is a bitwise way of performing mod 2
+                        multiline = false;
+                        arr[a][last] = arr[a][last]
+                            .substring(0, arr[a][last].length - 1)
+                            .replace(/""/g, '"');
+                    }
                 } else {
-                    arr[a].push(rows[r][c].replace(/""/g, '"'));
-                    multiline = false;
+                    if (
+                        c === clen - 1 &&
+                        rows[r][c].indexOf('"') === 0 &&
+                        countQuotes(rows[r][c]) & 1
+                    ) {
+                        arr[a].push(rows[r][c].substring(1).replace(/""/g, '"'));
+                        multiline = true;
+                    } else {
+                        arr[a].push(rows[r][c].replace(/""/g, '"'));
+                        multiline = false;
+                    }
                 }
             }
-        }
-        if (!multiline) {
-            a += 1;
-        }
-    }
-    return arr;
-}
-
-function stringifyArray(arr) {
-    let r,
-        rlen,
-        c,
-        clen,
-        str = "",
-        val;
-    for (r = 0, rlen = arr.length; r < rlen; r += 1) {
-        for (c = 0, clen = arr[r].length; c < clen; c += 1) {
-            if (c > 0) {
-                str += "\t";
+            if (!multiline) {
+                a += 1;
             }
-            val = arr[r][c];
-            if (typeof val === "string") {
-                if (val.indexOf("\n") > -1) {
-                    str += '"' + val.replace(/"/g, '""') + '"';
+        }
+        return arr;
+    }
+
+    function stringifyArray(arr) {
+        let r,
+            rlen,
+            c,
+            clen,
+            str = "",
+            val;
+        for (r = 0, rlen = arr.length; r < rlen; r += 1) {
+            for (c = 0, clen = arr[r].length; c < clen; c += 1) {
+                if (c > 0) {
+                    str += "\t";
+                }
+                val = arr[r][c];
+                if (typeof val === "string") {
+                    if (val.indexOf("\n") > -1) {
+                        str += '"' + val.replace(/"/g, '""') + '"';
+                    } else {
+                        str += val;
+                    }
+                } else if (val === null || val === void 0) {
+                    //void 0 resolves to undefined
+                    str += "";
                 } else {
                     str += val;
                 }
-            } else if (val === null || val === void 0) {
-                //void 0 resolves to undefined
-                str += "";
-            } else {
-                str += val;
             }
+            str += "\n";
         }
-        str += "\n";
+        return str;
     }
-    return str;
-}
 
-function betweenIncluded(value, bound1, bound2) {
-    return value >= Math.min(bound1, bound2) && value <= Math.max(bound1, bound2);
+    function betweenIncluded(value, bound1, bound2) {
+        return value >= Math.min(bound1, bound2) && value <= Math.max(bound1, bound2);
+    }
+
 }

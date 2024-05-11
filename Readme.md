@@ -2,10 +2,18 @@
 
 A tiny javascript spreadsheet UI for modern browsers, with proper virtualization and good performance.
 
-It's a 5kb minified, 2.3Kb gzipped
-https://bundlephobia.com/package/nanosheets@0.0.3
+https://bundlephobia.com/package/nanosheets
 
-
+Features :
+- copy paste from excel
+- infinite grid
+- basic editing on mobile (no selection of multiple cells though)
+- selection with common mouse and keyboard shortcuts
+- virtualized display that can easily display massive datasets
+- in-place editing of the data object to use as little ram as possible
+- simple data model (a flat hash map of coordinates to string values)
+- possibility to customise the look of every cell
+- possiblity to add default values in cells 
 
 # future features
 - lock some cells to prevent editing them 
