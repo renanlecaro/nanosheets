@@ -184,28 +184,28 @@ export function NanoSheets(
                 if (e.key === "ArrowRight") {
                     if (e.shiftKey) {
                         selection[2]++;
-                        scrollIntoView(selection[2], selection[3]);
+                        scrollTo(selection[2], selection[3]);
                     } else {
                         select(x + 1, y);
                     }
                 } else if (e.key === "ArrowLeft") {
                     if (e.shiftKey) {
                         selection[2] = Math.max(0, selection[2] - 1);
-                        scrollIntoView(selection[2], selection[3]);
+                        scrollTo(selection[2], selection[3]);
                     } else {
                         select(Math.max(0, x - 1), y);
                     }
                 } else if (e.key === "ArrowDown") {
                     if (e.shiftKey) {
                         selection[3]++;
-                        scrollIntoView(selection[2], selection[3]);
+                        scrollTo(selection[2], selection[3]);
                     } else {
                         select(x, y + 1);
                     }
                 } else if (e.key === "ArrowUp") {
                     if (e.shiftKey) {
                         selection[3] = Math.max(0, selection[3] - 1);
-                        scrollIntoView(selection[2], selection[3]);
+                        scrollTo(selection[2], selection[3]);
                     } else {
                         select(x, Math.max(0, y - 1));
                     }
@@ -226,15 +226,24 @@ export function NanoSheets(
         selection = [x, y, x, y];
         redraw();
         input.focus();
-        scrollIntoView(x, y);
+        scrollTo(x, y);
     }
 
-    function scrollIntoView(x, y) {
-        node.querySelector('[cell="' + x + "_" + y + '"]')?.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "nearest",
-        });
+    function scrollTo(x, y) {
+        const {width, height}=node.getBoundingClientRect()
+        let top=node.scrollTop
+        let left=node.scrollLeft
+        if (left+width<(x+1)*cellWidth) {
+            left=(x+1)*cellWidth - width
+        }else if(x*cellWidth < left){
+            left=x*cellWidth
+        }
+        if (top+height<(y+1)*cellHeight) {
+            top=(y+1)*cellHeight - height
+        }else if(y*cellHeight < top){
+            top=y*cellHeight
+        }
+        node.scroll({top,left,behavior:"auto"})
     }
 
     function stopEditing() {
@@ -258,8 +267,10 @@ export function NanoSheets(
     let lastClick = 0;
     listen(node, "mousedown", (e) => {
 
-        e.preventDefault();
         const cell = e.target.getAttribute("cell");
+        if (!cell) return
+        e.preventDefault();
+
         const [x, y] = cellXY(cell);
         if (Date.now() - 200 < lastClick && cell === editing) {
             //  Double click happened
@@ -345,6 +356,7 @@ export function NanoSheets(
     return {
         // Call this to remove listeners
         destroy,
+        scrollTo,
         redraw,
         data,
     };
