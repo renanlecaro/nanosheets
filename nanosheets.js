@@ -231,19 +231,17 @@ export function NanoSheets(
 
     function scrollTo(x, y) {
         const {width, height}=node.getBoundingClientRect()
-        let top=node.scrollTop
-        let left=node.scrollLeft
-        if (left+width<(x+1)*cellWidth) {
-            left=(x+1)*cellWidth - width
-        }else if(x*cellWidth < left){
-            left=x*cellWidth
+
+        if (node.scrollLeft+width<(x+1)*cellWidth) {
+            node.scrollLeft=(x+1)*cellWidth - width
+        }else if(x*cellWidth < node.scrollLeft){
+            node.scrollLeft=x*cellWidth
         }
-        if (top+height<(y+1)*cellHeight) {
-            top=(y+1)*cellHeight - height
-        }else if(y*cellHeight < top){
-            top=y*cellHeight
+        if (node.scrollTop+height<(y+1)*cellHeight) {
+            node.scrollTop=(y+1)*cellHeight - height
+        }else if(y*cellHeight < node.scrollTop){
+            node.scrollTop=y*cellHeight
         }
-        node.scroll({top,left,behavior:"auto"})
     }
 
     function stopEditing() {
