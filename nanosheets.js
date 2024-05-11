@@ -5,10 +5,11 @@ export function NanoSheets(
         onChange = () => null,
         cellWidth = 200,
         cellHeight = 40,
-        style = ({x, y, value, selected, cursor}) => ({
+        style = ({x, y, value, selected}) => ({
             padding: "0 10px",
-            border: cursor ? "2px solid #0a7ea4" : "1px solid #dadada",
-            background: selected ? 'lightblue' : 'white',
+            border:  "1px solid #dadada",
+            background: selected ? '#e2f7ff' : 'white',
+            transition: 'background 0.1s',
             color: 'black'
         }),
         defaultValue = ({x, y}) => ''
@@ -33,14 +34,15 @@ export function NanoSheets(
     const input = document.createElement('input')
     input.setAttribute("type", "text");
     Object.assign(input.style, {
-        font: 'inherit',
         zIndex: 2,
         lineHeight: cellHeight + 'px',
-        position: "absolute",
         width: cellWidth + "px",
         height: cellHeight + "px",
+        position: "absolute",
         boxSizing: 'border-box',
-        border: 'none'
+        border: '2px solid #00aae1',
+        transition:'left 0.2s, top 0.2s',
+        padding: '0 10px'
     })
     node.appendChild(input)
 
@@ -63,9 +65,9 @@ export function NanoSheets(
         Object.assign(input.style, {
             left: cellWidth * ex + "px",
             top: cellHeight * ey + "px",
-            opacity: editActive ? 1 : 0,
-            pointerEvents: editActive ? 'all' : 'none'
-
+            background: editActive ? 'white' : 'transparent',
+            color: editActive ? 'black' : 'transparent',
+            pointerEvents: editActive ? 'all' : 'none',
         })
 
         resizeGrid();
@@ -248,6 +250,8 @@ export function NanoSheets(
         if (editActive) {
             saveEditedValue();
             editActive = false;
+            // This avoids the remaining text showing up when you select it with shift + arrows
+            input.value=''
         }
     }
 
@@ -270,7 +274,7 @@ export function NanoSheets(
         e.preventDefault();
 
         const [x, y] = cellXY(cell);
-        if (Date.now() - 200 < lastClick && cell === editing) {
+        if (Date.now() - 400 < lastClick && cell === editing) {
             //  Double click happened
             startEditing(x, y);
         } else {
