@@ -115,7 +115,7 @@ export function NanoSheets(
             node.removeEventListener(...args),
         );
         ro.unobserve(node);
-        [node.children].forEach(n => n.parentElement.remove(n))
+        [node.children].forEach(n => n.remove())
         node.style = ''
     }
 
@@ -223,8 +223,7 @@ export function NanoSheets(
     );
 
     function select(x, y) {
-        const cell = [x, y].join("_");
-        editing = cell;
+        editing =  [x, y].join("_");
         selection = [x, y, x, y];
         redraw();
         input.focus();
@@ -371,7 +370,7 @@ function countQuotes(str) {
 }
 
 function parseArrayString(str) {
-    var r,
+    let r,
         rlen,
         rows,
         arr = [],
@@ -422,7 +421,7 @@ function parseArrayString(str) {
 }
 
 function stringifyArray(arr) {
-    var r,
+    let r,
         rlen,
         c,
         clen,
