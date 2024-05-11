@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanoSheets</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪶</text></svg>"
+    />
+  </head>
+  <body>
+    <div id="container1"></div>
+    <div id="container2"></div>
+    <style>
+      body {
+        background: #333;
+        height: 100vh;
+        width: 100vw;
+        padding: 40px;
+        display: flex;
+        gap: 40px;
+        box-sizing: border-box;
+      }
+      #container1,
+      #container2 {
+        flex-grow: 1;
+        align-self: stretch;
+      }
+    </style>
+    <script type="module">
+      import { NanoSheets } from "./nanosheets.js";
+      const data = { "0_0": "Hello" };
+      const instance1 = NanoSheets(document.getElementById("container1"), {
+        data,
+        onChange() {
+          instance2.redraw();
+        },
+      });
+      const instance2 = NanoSheets(document.getElementById("container2"), {
+        data,
+        onChange() {
+          instance1.redraw();
+        },
+      });
+    </script>
+  </body>
+</html>

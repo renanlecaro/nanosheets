@@ -1,0 +1,16 @@
+{
+  "name": "nanosheets",
+  "version": "1.0.0",
+  "description": "A minimal spreadsheet editor",
+  "main": "nanosheets.js",
+
+  "keywords": [
+    "sheets",
+    "minimal",
+    "table",
+    "excel",
+    "vanillajs"
+  ],
+  "author": "Renan LE CARO",
+  "license": "MIT"
+}
