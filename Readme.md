@@ -2,9 +2,8 @@
 
 A tiny javascript spreadsheet UI for modern browsers, with proper virtualization and good performance.
 
-# TODO
-
-- clear listeners on destroy
+# TODO 
+- use hidden input and divs
 - lock some cells
 - style some cells
 - test on safari/chrome

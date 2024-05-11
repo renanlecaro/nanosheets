@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NanoSheets</title>
 
     <link
@@ -23,6 +23,7 @@
         gap: 40px;
         box-sizing: border-box;
       }
+
       #container1,
       #container2 {
         flex-grow: 1;
@@ -31,6 +32,7 @@
     </style>
     <script type="module">
       import { NanoSheets } from "./nanosheets.js";
+
       const data = { "0_0": "Hello" };
       const instance1 = NanoSheets(document.getElementById("container1"), {
         data,
