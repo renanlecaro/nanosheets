@@ -1,10 +1,29 @@
 # Nano Sheets
 
-A tiny javascript spreadsheet UI for modern browsers, with proper virtualization and good performance.
+A tiny (2.5kb) javascript spreadsheet UI for modern browsers, with proper virtualization and good performance.
+See the demo here : https://nanosheets.lecaro.me/
 
-https://bundlephobia.com/package/nanosheets
+![Screenshot of the grid](screenshot.png)
 
-Features :
+## Installation
+
+    npm install nanosheets
+
+## Usage
+
+    import {NanoSheets} from "nanosheets"
+
+    const instance = NanoSheets(domNode, {
+        data:{'0_0':'Hello world'},
+        onChange(data){
+            data
+        }
+    })
+
+
+
+## Features :
+
 - copy paste from excel
 - infinite grid
 - basic editing on mobile (no selection of multiple cells though)
@@ -12,10 +31,17 @@ Features :
 - virtualized display that can easily display massive datasets
 - in-place editing of the data object to use as little ram as possible
 - simple data model (a flat hash map of coordinates to string values)
-- possibility to customise the look of every cell
-- possiblity to add default values in cells 
+- customise the look of every cell
+- add default values in cells 
 
-# future features
-- lock some cells to prevent editing them 
-- limit grid extension with max width/height options
-- ctrl+arrow to jump to the end of an empty or full block
+
+## How to contribute
+
+- bugfix PRs are welcome
+- new features PRs are not welcome
+- Issues for bugs are not welcome
+- Issues for new features are not welcome
+
+## License
+
+MIT
