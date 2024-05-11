@@ -17,15 +17,20 @@
 
 <script type="module">
 
-    import {NanoSheets} from "./nanosheets.js?4";
+    import {NanoSheets} from "./nanosheets.js";
 
     // The data of the table is in this format, the keys are "x_y" and the values are always strings
     const data = {
-        '0_0': 'Library Name', '1_0': 'Gzipped weight',
-        '0_1': 'NanoSheets','1_1':'2.3 KB',
-        '0_2': 'handsontable','1_2':'296.2 KB',
-        '0_3': 'ag-grid-community','1_3':'248 KB',
-        '0_4': '@mui/x-data-grid','1_4':'92.7 KB',
+        "0_0": "Library Name",
+        "1_0": "Gzipped weight",
+        "0_1": "handsontable",
+        "1_1": "296.2 KB",
+        "0_2": "ag-grid-community",
+        "1_2": "248 KB",
+        "0_3": "@mui/x-data-grid",
+        "1_3": "92.7 KB",
+        "0_4": "NanoSheets",
+        "1_4": "2.3 KB"
     }
 
     // You can create an editor like this
@@ -51,14 +56,14 @@
 
     // Here, we're showing the same data in two spreadsheets. Editing one should update the other
     const data = {
-        "0_0":"Feature", "1_0":"Status",
-        "0_1":"Cells selection", "1_1":"Working",
-        "0_2":"Copy/Paste", "1_2":"Working",
-        "0_3":"Mobile support", "1_3":"Basic",
-        "0_4":"Custom styles", "1_4":"Undocumented",
-        "0_5":"Undo", "1_5":"Difficult",
-        "0_6":"Formula", "1_6":"Out of scope",
-        "0_7":"Custom renderer", "1_7":"Out of scope",
+        "0_0": "Feature", "1_0": "Status",
+        "0_1": "Cells selection", "1_1": "Working",
+        "0_2": "Copy/Paste", "1_2": "Working",
+        "0_3": "Mobile support", "1_3": "Basic",
+        "0_4": "Custom styles", "1_4": "Undocumented",
+        "0_5": "Undo", "1_5": "Difficult",
+        "0_6": "Formula", "1_6": "Out of scope",
+        "0_7": "Custom renderer", "1_7": "Out of scope",
     };
     // Creating and editor returns an instance with some functions
     const instance1 = NanoSheets(document.getElementById("container2"), {
@@ -112,9 +117,10 @@
         box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.1);
         font-family: monospace;
     }
-    h1,h2{
-    font-size: 30px;
-    font-weight: lighter;
+
+    h1, h2 {
+        font-size: 30px;
+        font-weight: lighter;
     }
 </style>
 </body>

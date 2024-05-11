@@ -12,8 +12,8 @@ export function NanoSheets(
             background: selected ? '#e2f7ff' : 'white',
             transition: 'background 0.1s',
             color: 'black',
-            outline:'none'
-
+            outline:'none',
+            whiteSpace:'nowrap'
         }),
         defaultValue = ({x, y}) => ''
     },

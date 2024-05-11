@@ -6,9 +6,6 @@ It's a 5kb minified, 2.3Kb gzipped
 https://bundlephobia.com/package/nanosheets@0.0.3
 
 
-# MVP
-- mobile support
-
 
 # future features
 - lock some cells to prevent editing them 
