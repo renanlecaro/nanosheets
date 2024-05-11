@@ -5,18 +5,22 @@ export function NanoSheets(
         onChange = () => null,
         cellWidth = 200,
         cellHeight = 40,
-        style = ({x, y, value, selected, cursor, editing}) => ({
+        style = ({x, y, value, selected, cursor}) => ({
             padding: "0 10px",
             border: cursor ? "2px solid #0a7ea4" : "1px solid #dadada",
-            background: !editing && selected ? 'lightblue' : 'white'
+            background: selected ? 'lightblue' : 'white',
+            color: 'black'
         }),
+
     },
 ) {
+
     Object.assign(node.style, {overflow: "auto", position: "relative"});
     // So that we get key events even when no input is focused
-    node.setAttribute("tabindex", "0");
+
     let width,
         height = 0;
+
     const cellXY = (cell) => cell.split("_").map((v) => parseInt(v));
 
     // Whether input should go to "editing" cell
@@ -24,25 +28,48 @@ export function NanoSheets(
     let editing = '0_0';
     let selection = null;
 
+    // node.children[0] is the input we write in / focus
+    const input = document.createElement('input')
+    input.setAttribute("type", "text");
+    Object.assign(input.style, {
+        font: 'inherit',
+        zIndex: 2,
+        lineHeight: cellHeight + 'px',
+        position: "absolute",
+        width: cellWidth + "px",
+        height: cellHeight + "px",
+        boxSizing:'border-box',
+        border:'none'
+    })
+    node.appendChild(input)
+
     function resizeGrid() {
         const viewPortSize = node.getBoundingClientRect();
         width = Math.ceil(viewPortSize.width / cellWidth) + 1;
         height = Math.ceil(viewPortSize.height / cellHeight) + 1;
         const requiredCells = width * height;
-        while (node.children.length < requiredCells) {
-            const input = document.createElement("input");
-            input.setAttribute("type", "text");
-            node.appendChild(input);
+        while (node.children.length - 1 < requiredCells) {
+            const cell = document.createElement("div");
+            node.appendChild(cell);
         }
-        while (node.children.length > requiredCells) {
-            node.removeChild(node.children[0]);
+        while (node.children.length - 1 > requiredCells) {
+            node.removeChild(node.children[1]);
         }
     }
 
     function redraw() {
+        const [ex, ey] = cellXY(editing)
+        Object.assign(input.style, {
+            left: cellWidth * ex + "px",
+            top: cellHeight * ey + "px",
+            opacity: editActive ? 1 : 0,
+            pointerEvents: editActive ? 'all' : 'none'
+
+        })
+
         resizeGrid();
-        const leftStart = Math.ceil(node.scrollLeft / cellWidth) - 1;
-        const topStart = Math.ceil(node.scrollTop / cellHeight) - 1;
+        const leftStart = Math.floor(node.scrollLeft / cellWidth);
+        const topStart = Math.floor(node.scrollTop / cellHeight);
 
         const [x1, y1, x2, y2] = selection || [-1, -1, -1, -1,];
 
@@ -51,13 +78,13 @@ export function NanoSheets(
                 const x = leftStart + dx;
                 const y = topStart + dy;
                 const cell = x + "_" + y;
-                const input = node.children[dy * width + dx];
-                input.style = "";
-                Object.assign(input.style, {
-                    zIndex: editing === cell ? 1 : 0,
-                    lineHeight: cellHeight,
+                const div = node.children[dy * width + dx + 1];
+                div.style = "";
+                Object.assign(div.style, {
+                    lineHeight: cellHeight + 'px',
                     position: "absolute",
                     boxSizing: "border-box",
+                    overflow: "hidden",
                     left: cellWidth * x + "px",
                     top: cellHeight * y + "px",
                     width: cellWidth + "px",
@@ -72,15 +99,8 @@ export function NanoSheets(
                     }),
                 });
 
-                if (editing === cell && editActive) {
-                    input.removeAttribute("readonly");
-                    input.setAttribute("tabindex", "0");
-                } else {
-                    input.setAttribute("readonly", "");
-                    input.setAttribute("tabindex", "-1");
-                }
-                input.value = data[cell] || "";
-                input.setAttribute("cell", cell);
+                div.textContent = data[cell] || "";
+                div.setAttribute("cell", cell);
             }
         }
     }
@@ -93,9 +113,8 @@ export function NanoSheets(
             node.removeEventListener(...args),
         );
         ro.unobserve(node);
-        [node.children].forEach(n=>n.parentElement.remove(n))
-        node.style=''
-        node.removeAttribute("tabindex")
+        [node.children].forEach(n => n.parentElement.remove(n))
+        node.style = ''
     }
 
     function listen(node, ...args) {
@@ -124,13 +143,9 @@ export function NanoSheets(
         }
     }
 
-    listen(node, "blur", (e) => {
-        if (e.target.getAttribute("cell") === editing && editActive) {
-            editActive = false;
-            redraw();
-        }
-    });
-    listen(node, "focus", (e) => {
+
+    listen(input, "focus", () => {
+        // Editor got focused
         if (editing && !selection) {
             const [x, y] = cellXY(editing)
             selection = [x, y, x, y]
@@ -138,37 +153,31 @@ export function NanoSheets(
         }
     });
 
-    listen(node, "blur", () => {
+
+    listen(input, "blur", () => {
+        // Editor lost focus
         selection = null;
         editActive = false;
         redraw();
     });
-
     function saveEditedValue() {
-        if (editing && editActive) {
-            const input = node.querySelector('input[cell="' + editing + '"]');
-            if (input) {
-                changeData({[editing]: input.value});
-                redraw();
-            }
+        if (editActive) {
+            changeData({[editing]: input.value});
         }
     }
 
-    listen(node, "change", saveEditedValue);
 
     listen(
-        node,
+        input,
         "keydown",
         (e) => {
             if (e.ctrlKey) return;
             const [x, y] = cellXY(editing);
             if (e.key === "Enter") {
-                changeData({[e.target.getAttribute("cell")]: e.target.value});
-                select(x, y + 1);
+                stopEditing()
+                select(x, y+1)
             } else if (
-                !editing ||
-                !editActive ||
-                e.target.getAttribute("cell") !== editing
+                !editActive
             ) {
                 if (e.key === "ArrowRight") {
                     if (e.shiftKey) {
@@ -211,13 +220,11 @@ export function NanoSheets(
     );
 
     function select(x, y) {
-        saveEditedValue();
-
         const cell = [x, y].join("_");
         editing = cell;
         selection = [x, y, x, y];
         redraw();
-        node.focus();
+        input.focus();
         scrollIntoView(x, y);
     }
 
@@ -229,12 +236,22 @@ export function NanoSheets(
         });
     }
 
+    function stopEditing() {
+        if (editActive) {
+            saveEditedValue();
+            editActive = false;
+        }
+    }
+
     function startEditing(x, y) {
+
         const cell = [x, y].join("_");
-        editActive = true;
-        editing = cell;
+        if (!editActive || editing !== cell) {
+            editing = cell;
+            input.value = data[cell] || ''
+            editActive = true;
+        }
         redraw();
-        requestAnimationFrame(() => node.querySelector('[cell="' + cell + '"]')?.focus());
     }
 
     let lastClick = 0;
@@ -247,8 +264,7 @@ export function NanoSheets(
             //  Double click happened
             startEditing(x, y);
         } else {
-            saveEditedValue();
-            editActive = false;
+            stopEditing()
             lastClick = Date.now();
             if (cell !== editing) {
                 select(x, y);
@@ -261,12 +277,9 @@ export function NanoSheets(
         node,
         "mouseenter",
         (e) => {
-
-
             if (e.buttons === 1 && selection) {
                 const cell = e.target.getAttribute("cell");
-
-                if (selection) {
+                if (selection && cell) {
                     const [x, y] = cellXY(cell);
                     selection[2] = x;
                     selection[3] = y;
@@ -277,8 +290,8 @@ export function NanoSheets(
         true,
     );
 
-    listen(window, "paste", (e) => {
-        if (editActive || !selection) return;
+    listen(input, "paste", (e) => {
+        if (editActive) return;
         e.preventDefault();
         const rows = parseArrayString(
             (e.clipboardData || window.clipboardData).getData("text/plain"),
@@ -307,13 +320,13 @@ export function NanoSheets(
         e.clipboardData.setData("text/plain", stringifyArray(asArr));
     }
 
-    listen(window, "copy", (e) => {
-        if (!editActive && selection) {
+    listen(input, "copy", (e) => {
+        if (!editActive) {
             copySelectedToClipboardEvent(e);
         }
     });
-    listen(window, "cut", (e) => {
-        if (!editActive && selection) {
+    listen(input, "cut", (e) => {
+        if (!editActive) {
             copySelectedToClipboardEvent(e);
             const change = {};
             const [x1, y1, x2, y2] = selection;
