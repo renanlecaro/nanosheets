@@ -11,12 +11,13 @@ export function NanoSheets(
             background: selected ? 'lightblue' : 'white',
             color: 'black'
         }),
-
+        defaultValue = ({x, y}) => ''
     },
 ) {
 
     Object.assign(node.style, {overflow: "auto", position: "relative"});
-    // So that we get key events even when no input is focused
+    // // The node itself shouldn't get focus, despite being scrollable and clickable
+    node.setAttribute('tabindex', '-1')
 
     let width,
         height = 0;
@@ -38,8 +39,8 @@ export function NanoSheets(
         position: "absolute",
         width: cellWidth + "px",
         height: cellHeight + "px",
-        boxSizing:'border-box',
-        border:'none'
+        boxSizing: 'border-box',
+        border: 'none'
     })
     node.appendChild(input)
 
@@ -92,14 +93,13 @@ export function NanoSheets(
                     ...style({
                         x,
                         y,
-                        value: data[cell] || '',
+                        value: data[cell] || defaultValue({x, y}),
                         selected: betweenIncluded(x, x1, x2) && betweenIncluded(y, y1, y2),
                         cursor: editing === cell,
-                        editing: editing === cell && editActive
                     }),
                 });
 
-                div.textContent = data[cell] || "";
+                div.textContent = data[cell] || defaultValue({x, y});
                 div.setAttribute("cell", cell);
             }
         }
@@ -129,8 +129,9 @@ export function NanoSheets(
     function changeData(changes) {
         let hasChanged = false;
         for (const cell in changes) {
+            const [x, y] = cellXY(cell)
             if ((data[cell] || "") !== (changes[cell] || "")) {
-                if (changes[cell]) {
+                if (changes[cell] !== defaultValue({x, y})) {
                     data[cell] = changes[cell];
                 } else {
                     delete data[cell];
@@ -160,6 +161,7 @@ export function NanoSheets(
         editActive = false;
         redraw();
     });
+
     function saveEditedValue() {
         if (editActive) {
             changeData({[editing]: input.value});
@@ -175,7 +177,7 @@ export function NanoSheets(
             const [x, y] = cellXY(editing);
             if (e.key === "Enter") {
                 stopEditing()
-                select(x, y+1)
+                select(x, y + 1)
             } else if (
                 !editActive
             ) {
@@ -208,9 +210,8 @@ export function NanoSheets(
                         select(x, Math.max(0, y - 1));
                     }
                 } else if (editing && (e.key.length === 1 || e.key === "Backspace")) {
-                    changeData({[editing]: ""});
                     startEditing(x, y);
-                    changeData({[x + '_' + y]: e.key});
+                    input.value = ''
 
                 }
                 redraw();
@@ -248,7 +249,7 @@ export function NanoSheets(
         const cell = [x, y].join("_");
         if (!editActive || editing !== cell) {
             editing = cell;
-            input.value = data[cell] || ''
+            input.value = data[cell] || defaultValue({x, y})
             editActive = true;
         }
         redraw();
@@ -271,7 +272,7 @@ export function NanoSheets(
             }
         }
         redraw();
-    });
+    }, true);
 
     listen(
         node,
@@ -313,7 +314,7 @@ export function NanoSheets(
         for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
             const line = [];
             for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
-                line.push(data[x + "_" + y] || "");
+                line.push(data[x + "_" + y] || defaultValue({x, y}));
             }
             asArr.push(line);
         }
@@ -342,6 +343,7 @@ export function NanoSheets(
 
 
     return {
+        // Call this to remove listeners
         destroy,
         redraw,
         data,

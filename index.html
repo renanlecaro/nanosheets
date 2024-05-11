@@ -1,51 +1,98 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>NanoSheets</title>
 
     <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪶</text></svg>"
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪶</text></svg>"
     />
-  </head>
-  <body>
-    <div id="container1"></div>
-    <div id="container2"></div>
-    <style>
-      body {
+</head>
+<body>
+<h1>NanoSheets: high performance javascript spreadsheets library</h1>
+
+<div id="container1" style="height: 300px"></div>
+
+<script type="module">
+
+    import {NanoSheets} from "./nanosheets.js";
+
+    // The data of the table is in this format, the keys are "x_y" and the values are always strings
+    const data = {'0_0': 'Hello', '1_0': 'World', '2_0': '!'}
+
+    // You can create an editor like this
+    NanoSheets(document.getElementById("container1"), {
+        // Note that the object is being mutated in place, for performance reasons
+        data,
+        onChange(data) {
+            // The data we get there is also the same object
+            console.log(data)
+        }
+    });
+
+</script>
+
+<h2>Side by side synchronized editors</h2>
+<div class="split">
+    <div id="container2" style="height: 300px"></div>
+    <div id="container3" style="height: 300px"></div>
+</div>
+
+<script type="module">
+    import {NanoSheets} from "./nanosheets.js";
+
+    // Here, we're showing the same data in two spreadsheets. Editing one should update the other
+    const data = {};
+    // Creating and editor returns an instance with some functions
+    const instance1 = NanoSheets(document.getElementById("container2"), {
+        data,
+        onChange() {
+            instance2.redraw();
+        },
+    });
+    const instance2 = NanoSheets(document.getElementById("container3"), {
+        data,
+        onChange() {
+            instance1.redraw();
+        },
+    });
+
+</script>
+
+
+<style>
+    body {
         background: #333;
-        height: 100vh;
-        width: 100vw;
-        padding: 40px;
+        padding: 20px;
+        color: white;
+        font-family: sans-serif;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .split {
         display: flex;
+        align-items: stretch;
         gap: 40px;
-        box-sizing: border-box;
-      }
+        flex-wrap: wrap;
+    }
 
-      #container1,
-      #container2 {
+    .split > * {
         flex-grow: 1;
-        align-self: stretch;
-      }
-    </style>
-    <script type="module">
-      import { NanoSheets } from "./nanosheets.js";
+        flex-basis: 200px;
+    }
 
-      const data = { "0_0": "Hello" };
-      const instance1 = NanoSheets(document.getElementById("container1"), {
-        data,
-        onChange() {
-          instance2.redraw();
-        },
-      });
-      const instance2 = NanoSheets(document.getElementById("container2"), {
-        data,
-        onChange() {
-          instance1.redraw();
-        },
-      });
-    </script>
-  </body>
+    script {
+        display: block;
+        white-space: pre;
+        overflow: auto;
+        font-family: monospace;
+        background-color: #222;
+        border-radius: 4px;
+        box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.2);
+    }
+</style>
+</body>
 </html>
