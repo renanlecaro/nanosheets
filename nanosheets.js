@@ -7,7 +7,7 @@ export function NanoSheets(
         cellHeight = 40,
         style = ({x, y, value, selected}) => ({
             padding: "0 10px",
-            border:  "1px solid #dadada",
+            border: "1px solid #dadada",
             background: selected ? '#e2f7ff' : 'white',
             transition: 'background 0.1s',
             color: 'black'
@@ -41,7 +41,7 @@ export function NanoSheets(
         position: "absolute",
         boxSizing: 'border-box',
         border: '2px solid #00aae1',
-        transition:'left 0.2s, top 0.2s',
+        transition: 'left 0.2s, top 0.2s',
         padding: '0 10px'
     })
     node.appendChild(input)
@@ -175,47 +175,44 @@ export function NanoSheets(
         input,
         "keydown",
         (e) => {
-            if (e.ctrlKey) return;
+            console.log(e.key)
             const [x, y] = cellXY(editing);
-            if (e.key === "Enter") {
-                stopEditing()
-                select(x, y + 1)
-            } else if (
-                !editActive
-            ) {
-                if (e.key === "ArrowRight") {
-                    if (e.shiftKey) {
-                        selection[2]++;
-                        scrollTo(selection[2], selection[3]);
-                    } else {
-                        select(x + 1, y);
-                    }
-                } else if (e.key === "ArrowLeft") {
-                    if (e.shiftKey) {
-                        selection[2] = Math.max(0, selection[2] - 1);
-                        scrollTo(selection[2], selection[3]);
-                    } else {
-                        select(Math.max(0, x - 1), y);
-                    }
-                } else if (e.key === "ArrowDown") {
-                    if (e.shiftKey) {
-                        selection[3]++;
-                        scrollTo(selection[2], selection[3]);
-                    } else {
-                        select(x, y + 1);
-                    }
-                } else if (e.key === "ArrowUp") {
-                    if (e.shiftKey) {
-                        selection[3] = Math.max(0, selection[3] - 1);
-                        scrollTo(selection[2], selection[3]);
-                    } else {
-                        select(x, Math.max(0, y - 1));
-                    }
-                } else if (editing && (e.key.length === 1 || e.key === "Backspace")) {
-                    startEditing(x, y);
-                    input.value = ''
 
+            const allCells = Object.keys(data).map(cell => cellXY(cell))
+            const xMax = Math.max(...allCells.map(c => c[0]), x)
+
+            // Map of keys to moves of the cursor
+            const coords={
+                ArrowRight: [1, 0],
+                ArrowLeft: [-1, 0],
+                ArrowDown: [0, 1],
+                ArrowUp: [0, -1],
+                Enter: [0, 1],
+                PageDown: [0, height - 1],
+                PageUp: [0, -(height - 1)],
+                Home: [-x, 0],
+                End: [xMax - x, 0]
+            };
+            const shiftBy = coords[e.key]
+
+
+            if (e.key === "Delete" || e.key === "Backspace") {
+                clearSelectedCellsContent()
+                redraw()
+            } else if (shiftBy) {
+                stopEditing()
+                const [dx, dy] = shiftBy
+                if (e.shiftKey) {
+                    selection[2] = Math.max(0, selection[2] + dx);
+                    selection[3] = Math.max(0, selection[3] + dy);
+                    scrollTo(selection[2], selection[3]);
+                } else {
+                    select(Math.max(0, x + dx), Math.max(0, y + dy));
                 }
+                redraw();
+            } else if (!editActive && !e.ctrlKey && editing && (e.key.length === 1 || e.key === "Backspace")) {
+                startEditing(x, y);
+                input.value = ''
                 redraw();
             }
         },
@@ -223,7 +220,7 @@ export function NanoSheets(
     );
 
     function select(x, y) {
-        editing =  [x, y].join("_");
+        editing = [x, y].join("_");
         selection = [x, y, x, y];
         redraw();
         input.focus();
@@ -231,17 +228,17 @@ export function NanoSheets(
     }
 
     function scrollTo(x, y) {
-        const {width, height}=node.getBoundingClientRect()
+        const {width, height} = node.getBoundingClientRect()
 
-        if (node.scrollLeft+width<(x+1)*cellWidth) {
-            node.scrollLeft=(x+1)*cellWidth - width
-        }else if(x*cellWidth < node.scrollLeft){
-            node.scrollLeft=x*cellWidth
+        if (node.scrollLeft + width < (x + 1) * cellWidth) {
+            node.scrollLeft = (x + 1) * cellWidth - width
+        } else if (x * cellWidth < node.scrollLeft) {
+            node.scrollLeft = x * cellWidth
         }
-        if (node.scrollTop+height<(y+1)*cellHeight) {
-            node.scrollTop=(y+1)*cellHeight - height
-        }else if(y*cellHeight < node.scrollTop){
-            node.scrollTop=y*cellHeight
+        if (node.scrollTop + height < (y + 1) * cellHeight) {
+            node.scrollTop = (y + 1) * cellHeight - height
+        } else if (y * cellHeight < node.scrollTop) {
+            node.scrollTop = y * cellHeight
         }
     }
 
@@ -250,7 +247,7 @@ export function NanoSheets(
             saveEditedValue();
             editActive = false;
             // This avoids the remaining text showing up when you select it with shift + arrows
-            input.value=''
+            input.value = ''
         }
     }
 
@@ -338,17 +335,22 @@ export function NanoSheets(
             copySelectedToClipboardEvent(e);
         }
     });
+
+    function clearSelectedCellsContent() {
+        const change = {};
+        const [x1, y1, x2, y2] = selection;
+        for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+            for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+                change[x + "_" + y] = "";
+            }
+        }
+        changeData(change);
+    }
+
     listen(input, "cut", (e) => {
         if (!editActive) {
             copySelectedToClipboardEvent(e);
-            const change = {};
-            const [x1, y1, x2, y2] = selection;
-            for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
-                for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
-                    change[x + "_" + y] = "";
-                }
-            }
-            changeData(change);
+            clearSelectedCellsContent()
             redraw();
         }
     });
