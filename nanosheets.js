@@ -33,6 +33,7 @@ export function NanoSheets(
     // node.children[0] is the input we write in / focus
     const input = document.createElement('input')
     input.setAttribute("type", "text");
+    input.setAttribute("enterkeyhint", "done");
     Object.assign(input.style, {
         zIndex: 2,
         lineHeight: cellHeight + 'px',
