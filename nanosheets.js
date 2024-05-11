@@ -284,7 +284,7 @@ export function NanoSheets(
 
     let lastClick = 0;
     listen(node, "mousedown", (e) => {
-        
+
         const cell = e.target.getAttribute("cell");
         if (!cell || e.buttons !== 1) return
         e.preventDefault();
