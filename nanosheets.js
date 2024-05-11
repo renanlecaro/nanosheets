@@ -211,7 +211,7 @@ export function NanoSheets(
                     select(Math.max(0, x + dx), Math.max(0, y + dy));
                 }
                 redraw();
-            } else if (!editActive && !e.ctrlKey && editing && (e.key.length === 1 || e.key === "Backspace")) {
+            } else if (!editActive && !e.ctrlKey  && e.key.length === 1) {
                 startEditing(x, y);
                 input.value = ''
                 redraw();
@@ -219,6 +219,17 @@ export function NanoSheets(
         },
         true,
     );
+
+    listen(
+        input,
+        "change",()=>{
+             if (!editActive && input.value) {
+                const tmp=input.value
+                 startEditing(x, y);
+                input.value = tmp
+                redraw();
+            }
+        })
 
     function select(x, y) {
         editing = [x, y].join("_");
