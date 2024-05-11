@@ -7,7 +7,6 @@ https://bundlephobia.com/package/nanosheets@0.0.3
 
 
 # MVP
-- test on safari/chrome
 - mobile support
 
 

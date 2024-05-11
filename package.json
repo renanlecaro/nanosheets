@@ -3,6 +3,10 @@
   "version": "0.0.7",
   "description": "A minimal spreadsheet editor",
   "main": "nanosheets.js",
+  "scripts": {
+    "start": "npx -y  http-server -c-1 -o .  ",
+    "build": "./publish.sh"
+  },
   "keywords": [
     "sheets",
     "minimal",

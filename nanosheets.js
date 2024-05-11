@@ -7,16 +7,19 @@ export function NanoSheets(
         cellHeight = 40,
         style = ({x, y, value, selected}) => ({
             padding: "0 10px",
-            border: "1px solid #dadada",
+            borderBottom: "1px solid #dadada",
+            borderRight:'1px solid #dadada',
             background: selected ? '#e2f7ff' : 'white',
             transition: 'background 0.1s',
-            color: 'black'
+            color: 'black',
+            outline:'none'
+
         }),
         defaultValue = ({x, y}) => ''
     },
 ) {
 
-    Object.assign(node.style, {overflow: "auto", position: "relative"});
+    Object.assign(node.style, {overflow: "auto", position: "relative", border:'1px solid #dadada'});
     // // The node itself shouldn't get focus, despite being scrollable and clickable
     node.setAttribute('tabindex', '-1')
 
@@ -36,14 +39,16 @@ export function NanoSheets(
     input.setAttribute("type", "search");
     Object.assign(input.style, {
         zIndex: 2,
+        font:'inherit',
         lineHeight: cellHeight + 'px',
         width: cellWidth + "px",
         height: cellHeight + "px",
         position: "absolute",
         boxSizing: 'border-box',
-        border: '2px solid #00aae1',
+        border:'2px solid #00aae1',
+        borderRadius:'2px',
         transition: 'left 0.2s, top 0.2s',
-        padding: '0 10px'
+        padding: '0 8px',
     })
     node.appendChild(input)
 
@@ -160,8 +165,8 @@ export function NanoSheets(
 
     listen(input, "blur", () => {
         // Editor lost focus
+        stopEditing()
         selection = null;
-        editActive = false;
         redraw();
     });
 
@@ -183,7 +188,7 @@ export function NanoSheets(
             const xMax = Math.max(...allCells.map(c => c[0]), x)
 
             // Map of keys to moves of the cursor
-            const coords={
+            const coords = {
                 ArrowRight: [1, 0],
                 ArrowLeft: [-1, 0],
                 ArrowDown: [0, 1],
@@ -211,21 +216,24 @@ export function NanoSheets(
                     select(Math.max(0, x + dx), Math.max(0, y + dy));
                 }
                 redraw();
-            } else if (!editActive && !e.ctrlKey  && e.key.length === 1) {
-                startEditing(x, y);
-                input.value = ''
-                redraw();
             }
+            // else if (!editActive && !e.ctrlKey && e.key.length === 1) {
+            //     startEditing(x, y);
+            //     input.value = ''
+            //     redraw();
+            // }
         },
         true,
     );
 
     listen(
         input,
-        "change",()=>{
-             if (!editActive && input.value) {
-                const tmp=input.value
-                 startEditing(x, y);
+        "input", (e) => {
+            console.log('input',e)
+            if (!editActive && input.value) {
+            const [x, y] = cellXY(editing);
+                const tmp = input.value
+                startEditing(x, y);
                 input.value = tmp
                 redraw();
             }
