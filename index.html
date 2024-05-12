@@ -12,22 +12,24 @@
 </head>
 <body>
 <h1>High performance javascript spreadsheets library</h1>
+<p>This very lightweight and simple library is a way to show tabular data to your users and let them edit it. It's short
+    enough that you might consider just
+    modifying its source to add the features you need for your use case.
+</p>
+<h2>Usage</h2>
+<p>If you're using a bundler, run <code>npm install nanosheets</code> then import it with <code>import {NanoSheets} from
+    "nanosheets"</code>.</p>
 
 <div id="container1" style="height: 300px"></div>
 
-<script type="module">
 
-    /*
-
-    If you're using a bundler, run `npm install nanosheets` then import it with `import {NanoSheets} from "nanosheets"`
-
-    If you're just writing html, use a <script type="module"> tag to be able to import.
-
-    For this demo we're loading the full source file
-     */
-
+<script type="module" style="display: none">
+    // In this demo we're loading the js file direclty
     import {NanoSheets} from "./nanosheets.js";
 
+    window.NanoSheets = NanoSheets
+</script>
+<script type="module">
     // The data of the table is in this format, the keys are "x_y" and the values are always strings
     const data = {
         "0_0": "Library Name",
@@ -54,15 +56,33 @@
 
 </script>
 
+<h2>Simple data model</h2>
+<p>
+    This example show how data is saved. It's a simple object with cell coordinates as keys and cell content as value.
+    Cells can only contain string value.
+</p>
+<div id="container_data_model_demo" style="height: 300px"></div>
+<script type="module">
+
+    NanoSheets(document.getElementById("container_data_model_demo"), {
+        data: {
+            '0_0': 'Top left corner',
+            '1_0': 'One to the right',
+            '0_1': 'One lower',
+        }
+    });
+
+</script>
+
+
 <h2>Side by side synchronized editors</h2>
+<p>See changes on the left reflected on the right side. This just uses the same object for both editor's data, and lets
+    them know when to redraw. </p>
 <div class="split">
     <div id="container2" style="height: 300px"></div>
     <div id="container3" style="height: 300px"></div>
 </div>
-
 <script type="module">
-    import {NanoSheets} from "./nanosheets.js";
-
     // Here, we're showing the same data in two spreadsheets. Editing one should update the other
     const data = {
         "0_0": "Feature", "1_0": "Status",
@@ -74,12 +94,13 @@
         "0_6": "Formula", "1_6": "Out of scope",
         "0_7": "Custom renderer", "1_7": "Out of scope",
     };
+
     // Creating and editor returns an instance with some functions
     const instance1 = NanoSheets(document.getElementById("container2"), {
         data,
         onChange() {
             instance2.redraw();
-        },
+        }
     });
     const instance2 = NanoSheets(document.getElementById("container3"), {
         data,
@@ -87,7 +108,6 @@
             instance1.redraw();
         },
     });
-
 </script>
 
 <a href="https://github.com/renanlecaro/nanosheets" target="_blank" id="gh-link">github</a>
@@ -104,15 +124,15 @@
     }
 
     #gh-link {
-      position: fixed;
-      top: 10px;
-      right: -54px;
-      display: block;
-      background: #333;
-      padding: 4px 60px;
-      color: white;
-      text-decoration: none;
-      transform: rotate(45deg);
+        position: fixed;
+        top: 10px;
+        right: -54px;
+        display: block;
+        background: #333;
+        padding: 4px 60px;
+        color: white;
+        text-decoration: none;
+        transform: rotate(45deg);
     }
 
     .split {
