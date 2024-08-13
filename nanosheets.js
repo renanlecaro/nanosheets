@@ -378,21 +378,6 @@ export function NanoSheets(
     });
 
 
-    return {
-        // Call this to remove listeners
-        destroy,
-        // Scroll a specific cell into view
-        scrollTo,
-        // Select a specific cell
-        select,
-        // Redraw  the view after you changed the data or style
-        redraw,
-    };
-
-    // Functions declared here will be hoisted above while making it clear to uglify-js that
-    // they are private
-
-
     // from https://github.com/warpech/sheetclip/blob/master/sheetclip.js
     function countQuotes(str) {
         return str.split('"').length - 1;
@@ -484,4 +469,16 @@ export function NanoSheets(
         return value >= Math.min(bound1, bound2) && value <= Math.max(bound1, bound2);
     }
 
+
+
+    return {
+        // Call this to remove listeners
+        destroy,
+        // Scroll a specific cell into view
+        scrollTo,
+        // Select a specific cell
+        select,
+        // Redraw  the view after you changed the data or style
+        redraw,
+    };
 }
