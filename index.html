@@ -120,19 +120,16 @@
     </label>
 </div>
 <script type="module">
-    // Here, we're showing the same data in two spreadsheets. Editing one should update the other
     const data = {
         "0_0": "Read", "1_0": "Only",
     };
-
-    // Creating and editor returns an instance with some functions
-    const instance3 = NanoSheets(document.getElementById("container4"), {
+    const readOnlyInstance = NanoSheets(document.getElementById("container4"), {
         data,
         readOnly:true,
     });
     document.getElementById('container4-toggle').addEventListener('input',e=>{
         console.log(e.target.checked)
-        instance3.readOnly=e.target.checked
+        readOnlyInstance.readOnly=e.target.checked
     })
 
 </script>
