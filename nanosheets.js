@@ -31,11 +31,11 @@ export function NanoSheets(
     // // The node itself shouldn't get focus, despite being scrollable and clickable
     node.setAttribute('tabindex', '-1')
 
-    let width,
-        height = 0;
 
     const cellXY = (cell) => cell.split("_").map((v) => parseInt(v));
 
+    let width,
+        height = 0;
     // Whether input should go to "editing" cell
     let editActive = false;
     let cursor = [0, 0];
@@ -56,17 +56,45 @@ export function NanoSheets(
     }, inputStyle)
     node.appendChild(input)
 
+
+    // node.children[1] is the div making scroll easier
+    const sizer = document.createElement('div')
+    sizer.style.pointerEvents = 'none'
+    sizer.style.position = 'absolute'
+    sizer.style.width = '1px'
+    sizer.style.height = '1px'
+
+
+    node.appendChild(sizer)
+    // This is used to make the scrollable area bigger, but also to quickly go to the "left" of the dataset
+    const dataSize = [0, 0]
+
+    function makeScrollEasier(changed) {
+        console.log('makeScrollEasier', changed)
+        // Put a min width and height to make scrolling easier
+        Object.keys(changed).forEach(key => {
+            const coord = cellXY(key)
+            if (coord[0] > dataSize[0]) dataSize[0] = coord[0]
+            if (coord[1] > dataSize[1]) dataSize[1] = coord[1]
+        })
+        sizer.style.left = dataSize[0] * cellWidth + 'px'
+        sizer.style.top = dataSize[1] * cellHeight + 'px'
+    }
+
+    makeScrollEasier(data)
+
+
     function resizeGrid() {
         const viewPortSize = node.getBoundingClientRect();
         width = Math.ceil(viewPortSize.width / cellWidth) + 1;
         height = Math.ceil(viewPortSize.height / cellHeight) + 1;
         const requiredCells = width * height;
-        while (node.children.length - 1 < requiredCells) {
+        while (node.children.length - 2 < requiredCells) {
             const cell = document.createElement("div");
             node.appendChild(cell);
         }
-        while (node.children.length - 1 > requiredCells) {
-            node.removeChild(node.children[1]);
+        while (node.children.length - 2 > requiredCells) {
+            node.removeChild(node.children[2]);
         }
     }
 
@@ -79,11 +107,18 @@ export function NanoSheets(
 
         const [ex, ey] = cursor
         Object.assign(input.style, {
+
+            position: 'absolute',
             left: cellWidth * ex + "px",
             top: cellHeight * ey + "px",
-            background: editActive ? 'white' : 'transparent',
-            color: editActive ? 'black' : 'transparent',
-            pointerEvents: editActive ? 'all' : 'none',
+        },editActive ? {
+            background: 'white',
+            color: 'black',
+            pointerEvents: 'all'
+        } : {
+            background: 'transparent',
+            color: 'transparent',
+            pointerEvents: 'none',
         })
         if (readOnly)
             input.setAttribute("readonly", "");
@@ -99,7 +134,7 @@ export function NanoSheets(
                 const x = leftStart + dx;
                 const y = topStart + dy;
                 const cell = x + "_" + y;
-                const div = node.children[dy * width + dx + 1];
+                const div = node.children[dy * width + dx + 2];
                 div.style = "";
                 Object.assign(div.style, {
                     lineHeight: cellHeight + 'px',
@@ -146,7 +181,7 @@ export function NanoSheets(
     redraw();
 
     function changeData(changes) {
-        if(readOnly) return
+        if (readOnly) return
         let hasChanged = false;
         for (const cell in changes) {
             const [x, y] = cellXY(cell)
@@ -161,9 +196,9 @@ export function NanoSheets(
         }
         if (hasChanged) {
             afterDataChange();
+            makeScrollEasier(changes)
         }
     }
-
 
     listen(input, "focus", () => {
         // Editor got focused
@@ -196,8 +231,6 @@ export function NanoSheets(
 
             const [x, y] = cursor;
 
-            const allCells = Object.keys(data).map(cell => cellXY(cell))
-            const xMax = Math.max(...allCells.map(c => c[0]), x)
 
             // Map of keys to moves of the cursor
             const coords = {
@@ -209,7 +242,7 @@ export function NanoSheets(
                 PageDown: [0, height - 1],
                 PageUp: [0, -(height - 1)],
                 Home: [-x, 0],
-                End: [xMax - x, 0]
+                End: [dataSize[0] - x, 0]
             };
             const shiftBy = coords[e.key]
 
@@ -236,9 +269,7 @@ export function NanoSheets(
     listen(
         input,
         "input", (e) => {
-
             if (!editActive && input.value) {
-
                 const tmp = input.value
                 startEditing(...cursor);
                 input.value = tmp
@@ -249,7 +280,6 @@ export function NanoSheets(
 
     function scrollTo(x, y) {
         const {width, height} = node.getBoundingClientRect()
-
         if (node.scrollLeft + width < (x + 1) * cellWidth) {
             node.scrollLeft = (x + 1) * cellWidth - width
         } else if (x * cellWidth < node.scrollLeft) {
@@ -266,8 +296,12 @@ export function NanoSheets(
         cursor = [x, y]
         selection = [x, y, x, y];
         redraw();
-        input.focus();
-        scrollTo(x, y);
+        scrollTo(x, y)
+       //  Wait for the transition to finish first, otherwise
+       // if you select a cell that's far form the previous one
+        // the focus cancells the scroll above
+       setTimeout(()=>input.focus(),200)
+
     }
 
     function stopEditing() {
@@ -292,22 +326,28 @@ export function NanoSheets(
 
     let lastClick = 0;
     listen(node, "mousedown", (e) => {
-
         const cell = e.target.getAttribute("cell");
+        console.log('A', e.target, cell, node.scrollLeft, node.scrollTop)
+
         if (!cell || e.buttons !== 1) return
         e.preventDefault();
+
+        console.log('B', cell, node.scrollLeft, node.scrollTop)
 
         const [x, y] = cellXY(cell);
         if (cell === cursor.join('_')) {
             //  Double click happened
-            if (Date.now() - 400 < lastClick) {
+            if (Date.now() - 400 < lastClick && !readOnly) {
                 startEditing(x, y);
             }
         } else {
+            console.log('C', cell, node.scrollLeft, node.scrollTop)
             stopEditing()
+            console.log('D', cell, node.scrollLeft, node.scrollTop)
             select(x, y);
             lastClick = Date.now();
         }
+        console.log('E', cell, node.scrollLeft, node.scrollTop)
         redraw();
     }, true);
 
@@ -485,10 +525,13 @@ export function NanoSheets(
         // Select a specific cell
         select,
         // Redraw  the view after you changed the data or style
-        redraw,
+        redraw() {
+            redraw()
+            makeScrollEasier(data)
+        },
         data,
-        set readOnly(value){
-            readOnly=value
+        set readOnly(value) {
+            readOnly = value
             redraw()
         }
     };
