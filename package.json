@@ -1,6 +1,6 @@
 {
   "name": "nanosheets",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A minimal spreadsheet editor",
   "main": "nanosheets.js",
   "scripts": {
