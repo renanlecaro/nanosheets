@@ -17,7 +17,8 @@ See the demo here : https://nanosheets.lecaro.me/
         data:{'0_0':'Hello world'},
         onChange(data){
             data
-        }
+        },
+        readOnly:false,
     })
 
 
@@ -32,7 +33,6 @@ See the demo here : https://nanosheets.lecaro.me/
 - in-place editing of the data object to use as little ram as possible
 - simple data model (a flat hash map of coordinates to string values)
 - customise the look of every cell
-- add default values in cells 
 
 
 ## How to contribute
