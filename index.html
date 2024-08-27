@@ -21,7 +21,8 @@
 <h2>Usage</h2>
 <p>If you're using a bundler, run <code>npm install nanosheets</code> then import it with <code>import {NanoSheets} from
     "nanosheets"</code>.
-    You can also <a target="_blank" href="https://fastpen.lecaro.me/#H4sIAAAAAAAAA0WPywrCMBBF9%2FmKkE0UpCm462shCLpx4wdIacY2khfNtFiK%2F27agt7FZR5nYG4h1UiVLBk6dIwGnDSUrAPVdpgd09S%2FWVWICFWEFKHplUeKk4%2BMcXLQwOJcGe96pPOttu7eAWD40GfvDOUdog%2BZEI20yStI0GrsEwsorDfCRjysOM%2FJ%2F3ZHaJR0zWDAYtICnjUs5Wm6yh1f%2FuT7wwrNq694jXX2bxfx9JHyjF9Aa8d%2Fmw%2FZnOxzGhOJLVJFvqaUFWwIAQAA">
+    You can also <a target="_blank"
+                    href="https://fastpen.lecaro.me/#H4sIAAAAAAAAA0WPywrCMBBF9%2FmKkE0UpCm462shCLpx4wdIacY2khfNtFiK%2F27agt7FZR5nYG4h1UiVLBk6dIwGnDSUrAPVdpgd09S%2FWVWICFWEFKHplUeKk4%2BMcXLQwOJcGe96pPOttu7eAWD40GfvDOUdog%2BZEI20yStI0GrsEwsorDfCRjysOM%2FJ%2F3ZHaJR0zWDAYtICnjUs5Wm6yh1f%2FuT7wwrNq694jXX2bxfx9JHyjF9Aa8d%2Fmw%2FZnOxzGhOJLVJFvqaUFWwIAQAA">
         pull the library from jsdeliver
     </a>.
 </p>
@@ -54,14 +55,14 @@
     // You can create an editor like this
     NanoSheets(
         document.getElementById("container1"), {
-        // Note that the object is being mutated in place,
-        // for performance reasons
-        data,
-        onChange(data) {
-            // The data we get there is also the same object
-            console.log(data)
-        }
-    });
+            // Note that the object is being mutated in place,
+            // for performance reasons
+            data,
+            onChange(data) {
+                // The data we get there is also the same object
+                console.log(data)
+            }
+        });
 
 </script>
 
@@ -75,12 +76,12 @@
 
     NanoSheets(
         document.getElementById("container_data_model_demo"), {
-        data: {
-            '0_0': 'Top left corner',
-            '1_0': 'One to the right',
-            '0_1': 'One lower',
-        }
-    });
+            data: {
+                '0_0': 'Top left corner',
+                '1_0': 'One to the right',
+                '0_1': 'One lower',
+            }
+        });
 
 </script>
 
@@ -109,26 +110,27 @@
     // Creating and editor returns an instance with some functions
     const instance1 = NanoSheets(
         document.getElementById("container2"), {
-        data,
-        afterDataChange() {
-            instance2.redraw();
-        }
-    });
+            data,
+            afterDataChange() {
+                instance2.redraw();
+            }
+        });
     const instance2 = NanoSheets(
         document.getElementById("container3"), {
-        data,
-        afterDataChange() {
-            instance1.redraw();
-        },
-    });
+            data,
+            afterDataChange() {
+                instance1.redraw();
+            },
+        });
 </script>
 
 <h2>Read only</h2>
-<p>You can initialize the sheet with <code>readOnly:true</code>, or update it later by setting the instance <code>readOnly</code> property.</p>
+<p>You can initialize the sheet with <code>readOnly:true</code>, or update it later by setting the instance <code>readOnly</code>
+    property.</p>
 <div class="split">
     <div id="container4" style="height: 300px"></div>
     <label>
-        <input  id="container4-toggle" type="checkbox" checked/>
+        <input id="container4-toggle" type="checkbox" checked/>
         Read only
     </label>
 </div>
@@ -138,26 +140,28 @@
     };
     const readOnlyInstance = NanoSheets(
         document.getElementById("container4"),
-        {data, readOnly:true,}
+        {data, readOnly: true,}
     );
     document.getElementById('container4-toggle')
-        .addEventListener('input',e=>{
-        console.log(e.target.checked)
-        readOnlyInstance.readOnly=e.target.checked
-    })
+        .addEventListener('input', e => {
+            console.log(e.target.checked)
+            readOnlyInstance.readOnly = e.target.checked
+        })
 
 </script>
 
 <h2>Large datasets</h2>
-<p>Nanosheets can easily display and edit large datasets. Below is a 100 000 cells dataset (100x1000). The scroll area adjusts to the current data. There's no penalty for having empty space between the defined values in your dataset, as the cells are accessed as keys of an object.</p>
+<p>Nanosheets can easily display and edit large datasets. Below is a 100 000 cells dataset (100x1000). The scroll area
+    adjusts to the current data. There's no penalty for having empty space between the defined values in your dataset,
+    as the cells are accessed as keys of an object.</p>
 <div class="split">
     <div id="container5" style="height: 300px"></div>
 </div>
 <script type="module">
     const data = {};
-    for(let x=0;x<100; x++){
-         for(let y=0;y<1000; y++){
-            data[x+'_'+y]= 'x:'+x+' y:'+y
+    for (let x = 0; x < 100; x++) {
+        for (let y = 0; y < 1000; y++) {
+            data[x + '_' + y] = 'x:' + x + ' y:' + y
         }
     }
 
@@ -168,9 +172,148 @@
 
 </script>
 
-<a href="https://github.com/renanlecaro/nanosheets" target="_blank" id="gh-link">github</a>
+<h2>Create and destroy</h2>
+<p> <button id="create_destroy">Click this button</button> to  create and then cleaned up an instance with <code>instance.destroy()</code>.</p>
 
-<style  >
+    <div id="container6" style="height: 300px"></div>
+
+<script type="module">
+
+    let instance6;
+
+
+    document.getElementById('create_destroy').addEventListener('click',e => {
+        e.preventDefault()
+
+         if (instance6) {
+            // Remove all listeners and cell nodes
+            instance6.destroy()
+            // Erase the reference to the instance
+            instance6 = null
+        } else {
+            //  Create an instance
+            instance6 = NanoSheets(
+                document.getElementById("container6"),
+                {
+                    data: {
+                        '0_0': 'click',
+                        '1_0': 'the',
+                        '2_0': 'button'
+                    }
+                }
+            );
+        }
+    });
+
+
+</script>
+
+<h2>Select cells programmatically</h2>
+<p><button id="random_selection">Click this button</button> to change the selection wiht the <code>instance.select(x,y)</code> method.</p>
+
+    <div id="container7" style="height: 300px"></div>
+
+<script type="module">
+     const data = {};
+    for (let x = 0; x < 5; x++) {
+        for (let y = 0; y < 8; y++) {
+            data[x + '_' + y] =   ''+(x* y)
+        }
+    }
+
+    let instance7 = NanoSheets(
+        document.getElementById("container7"),
+        {data}
+    );
+
+    document.getElementById('random_selection').addEventListener('click',e => {
+        e.preventDefault()
+        instance7.select(
+            Math.floor(Math.random() * 5),
+            Math.floor(Math.random() * 8)
+        )
+    });
+
+
+</script>
+
+
+<h2>Custom styling</h2>
+<p>There are a few parameters you can change. If that's not enough, you can add css rules, or change the source directly. </p>
+
+    <div id="container8" style="height: 300px"></div>
+
+<script type="module">
+
+    const data = {};
+    for (let x = 0; x < 100; x++) {
+        for (let y = 0; y < 100; y++) {
+            const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            data[x + '_' + y] =  chars[Math.floor(chars.length*Math.random())]
+        }
+    }
+
+    let instance8 = NanoSheets(
+        document.getElementById("container8"),
+        {
+            data,
+            cellWidth:40,
+            cellHeight:40,
+            cellStyle: (x, y, value, selected) => ({
+                padding: "0 10px",
+                // That's the grid border
+                borderBottom: "1px solid white",
+                borderRight: "1px solid white",
+                // When you select a cell, it's highlighted in light blue
+                background: selected ? "rgba(0,0,0,0.3)" : "transparent",
+                color: selected ? "red" : "white",
+                outline: "none",
+                whiteSpace: "nowrap",
+                textAlign:"center",
+                fontWeight:selected?'bold':'normal',
+                transform:selected?'rotate(360deg) ':'',
+                zIndex:selected?'1':'',
+                transition:'transform 0.3s',
+                transformOrigin:'center',
+                userSelect:'none'
+            }),
+            inputStyle: {
+                font: "monospaced",
+                border: "4px dotted white",
+                borderRadius: "2px",
+                transition: "left 0.2s, top 0.2s",
+                padding: "0 8px",
+                textAlign:"center",
+            },
+            containerStyle: {
+                overflow: "auto",
+                position: "relative",
+                boxShadow:'inset 10px 10px 50px rgba(0,0,0,0.5)',
+                background:'linear-gradient(45deg, red, blue)',
+                borderRadius: '20px',
+            }
+        }
+    );
+
+    document.getElementById('random_selection').addEventListener('click',e => {
+        e.preventDefault()
+        instance8.select(
+            Math.floor(Math.random() * 5),
+            Math.floor(Math.random() * 8)
+        )
+    });
+
+
+</script>
+
+
+<h2>License</h2>
+<p>This lib is MIT licensed, do what you want with it. Don't expect free support and bugfixes though.</p>
+
+
+<a href="https://github.com/renanlecaro/nanosheets" target="_blank" id="gh-link">GitHub</a>
+
+<style>
 
     body {
         padding: 20px;
@@ -187,9 +330,11 @@
         font-size: 30px;
         color: #002831;
     }
-    p{
+
+    p {
         font-size: 18px;
     }
+
     #gh-link {
         position: fixed;
         top: 10px;
@@ -223,10 +368,11 @@
         margin-top: 40px;
         border-radius: 4px;
         box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.1);
-        font:inherit;
+        font: inherit;
         font-family: monospace;
     }
-    code{
+
+    code {
         background: #002831;
         color: white;
         padding: 0 10px;
