@@ -486,7 +486,7 @@ export function NanoSheets(
         select,
         // Redraw  the view after you changed the data or style
         redraw,
-
+        data,
         set readOnly(value){
             readOnly=value
             redraw()
