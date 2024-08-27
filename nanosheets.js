@@ -2,10 +2,11 @@ export function NanoSheets(
     node,
     {
         data = {},
-        afterDataChange  = () => null,
+        afterDataChange = () => null,
         beforeRedraw = () => null,
         cellWidth = 200,
         cellHeight = 40,
+        readOnly = false,
         inputStyle = {
             font: 'inherit',
             border: '2px solid #00aae1',
@@ -44,6 +45,7 @@ export function NanoSheets(
     const input = document.createElement('input')
     // https://stackoverflow.com/a/53126190/3597869
     input.setAttribute("type", "search");
+
     Object.assign(input.style, {
         zIndex: 2,
         lineHeight: cellHeight + 'px',
@@ -83,6 +85,10 @@ export function NanoSheets(
             color: editActive ? 'black' : 'transparent',
             pointerEvents: editActive ? 'all' : 'none',
         })
+        if (readOnly)
+            input.setAttribute("readonly", "");
+        else
+            input.removeAttribute("readonly", "");
 
         resizeGrid();
 
@@ -140,6 +146,7 @@ export function NanoSheets(
     redraw();
 
     function changeData(changes) {
+        if(readOnly) return
         let hasChanged = false;
         for (const cell in changes) {
             const [x, y] = cellXY(cell)
@@ -470,7 +477,6 @@ export function NanoSheets(
     }
 
 
-
     return {
         // Call this to remove listeners
         destroy,
@@ -480,5 +486,10 @@ export function NanoSheets(
         select,
         // Redraw  the view after you changed the data or style
         redraw,
+
+        set readOnly(value){
+            readOnly=value
+            redraw()
+        }
     };
 }

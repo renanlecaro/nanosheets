@@ -98,16 +98,43 @@
     // Creating and editor returns an instance with some functions
     const instance1 = NanoSheets(document.getElementById("container2"), {
         data,
-        onChange() {
+        afterDataChange() {
             instance2.redraw();
         }
     });
     const instance2 = NanoSheets(document.getElementById("container3"), {
         data,
-        onChange() {
+        afterDataChange() {
             instance1.redraw();
         },
     });
+</script>
+
+<h2>Read only</h2>
+<p>You can initialize the sheet with <code>readOnly:true</code>, or update it later by setting the instance <code>readOnly</code> property.</p>
+<div class="split">
+    <div id="container4" style="height: 300px"></div>
+    <label>
+        <input  id="container4-toggle" type="checkbox" checked/>
+        Read only
+    </label>
+</div>
+<script type="module">
+    // Here, we're showing the same data in two spreadsheets. Editing one should update the other
+    const data = {
+        "0_0": "Read", "1_0": "Only",
+    };
+
+    // Creating and editor returns an instance with some functions
+    const instance3 = NanoSheets(document.getElementById("container4"), {
+        data,
+        readOnly:true,
+    });
+    document.getElementById('container4-toggle').addEventListener('input',e=>{
+        console.log(e.target.checked)
+        instance3.readOnly=e.target.checked
+    })
+
 </script>
 
 <a href="https://github.com/renanlecaro/nanosheets" target="_blank" id="gh-link">github</a>
