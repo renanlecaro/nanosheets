@@ -38,7 +38,7 @@ export function NanoSheets(
         }
     },
 ) {
-    const originalStyle = node.getAttribute('style') || '' ;
+    const originalStyle = node.getAttribute('style') || '';
     Object.assign(node.style, containerStyle);
     // // The node itself shouldn't get focus, despite being scrollable and clickable
     node.setAttribute("tabindex", "-1");
@@ -185,6 +185,7 @@ export function NanoSheets(
     function listen(node, ...args) {
         node.addEventListener(...args);
         listeners.push({node, args});
+
     }
 
     ro.observe(node);
@@ -326,7 +327,6 @@ export function NanoSheets(
         "mousedown",
         (e) => {
             const cell = e.target.getAttribute("cell");
-
             if (!cell || e.buttons !== 1) return;
             e.preventDefault();
 
@@ -348,6 +348,44 @@ export function NanoSheets(
         },
         true,
     );
+
+    let lasttouchstart = null
+    listen(
+        node,
+        "touchstart",
+        (e) => {
+            lasttouchstart = e.target.getAttribute("cell");
+            // e.preve
+        },
+        true,
+    );
+
+    listen(
+        node,
+        "touchend",
+        (e) => {
+            const cell = e.target.getAttribute("cell")
+            if (cell === lasttouchstart) {
+
+                // e.preventDefault();
+                const [x, y] = cellXY(cell);
+                if (cell === cursor.join("_") && !readOnly) {
+                    startEditing(x, y);
+                    setTimeout(() => {
+                        input.select()
+                        input.focus()
+                    }, 200);
+                } else {
+                    input.blur()
+                    stopEditing();
+                    select(x, y);
+                }
+            }
+            ;
+        },
+        true,
+    );
+
 
     listen(
         node,
