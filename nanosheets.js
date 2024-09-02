@@ -6,6 +6,7 @@ export function NanoSheets(
         data = {},
         afterDataChange = () => null,
         beforeRedraw = () => null,
+        afterCursorChange = () => null,
         cellWidth = 200,
         cellHeight = 40,
         readOnly = false,
@@ -206,8 +207,8 @@ export function NanoSheets(
             }
         }
         if (hasChanged) {
-            afterDataChange();
             makeScrollEasier(changes);
+            afterDataChange();
         }
     }
 
@@ -300,6 +301,7 @@ export function NanoSheets(
         selection = [x, y, x, y];
         redraw();
         scrollTo(x, y);
+        afterCursorChange()
     }
 
     function stopEditing() {

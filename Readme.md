@@ -34,6 +34,10 @@ See the demo here : https://nanosheets.lecaro.me/
 - simple data model (a flat hash map of coordinates to string values)
 - customise the look of every cell
 
+## TODO
+
+- ctrl+A to select whole sheet content 
+
 
 ## How to contribute
 
