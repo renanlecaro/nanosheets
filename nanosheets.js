@@ -297,7 +297,9 @@ export function NanoSheets(
     }
 
     function select(x, y) {
-        cursor = [x, y];
+        cursor[0] = x
+        cursor[1] = y
+
         selection = [x, y, x, y];
         redraw();
         scrollTo(x, y);
@@ -316,7 +318,9 @@ export function NanoSheets(
     function startEditing(x, y) {
         const cell = [x, y].join("_");
         if (!editActive || cursor[0] !== x || cursor[1] !== y) {
-            cursor = [x, y];
+            cursor[0] = x
+            cursor[1] = y
+            ;
             input.value = data[cell] || "";
             editActive = true;
         }
@@ -568,6 +572,9 @@ export function NanoSheets(
             makeScrollEasier(data);
         },
         data,
+        get cursor(){
+            return [...cursor]
+        },
         set readOnly(value) {
             readOnly = value;
             redraw();

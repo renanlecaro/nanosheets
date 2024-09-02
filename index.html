@@ -113,7 +113,7 @@
             data,
             afterDataChange() {
                 instance2.redraw();
-            }
+            },
         });
     const instance2 = NanoSheets(
         document.getElementById("container3"), {
@@ -302,6 +302,71 @@
             Math.floor(Math.random() * 8)
         )
     });
+
+
+</script>
+
+
+<h2>Selection tracking</h2>
+
+
+<div class="split">
+    <div id="container9" style="height: 300px"></div>
+    <div id="container10" style="height: 300px"></div>
+</div>
+<script type="module">
+
+    const data = {};
+    let instance9 ;
+    let instance10;
+
+    instance9=NanoSheets(
+        document.getElementById("container9"),
+        {
+            data,
+            cellStyle: (x, y,value, selected)=>({
+                background: selected ? "#e2f7ff" : (instance10?.cursor[0]===x &&  instance10?.cursor[1]===y ?'#6981ff':'white') ,
+                padding: "0 10px",
+                borderBottom: "1px solid #dadada",
+                borderRight: "1px solid #dadada",
+                transition: "background 0.1s",
+                color: "black",
+                outline: "none",
+                whiteSpace: "nowrap",
+            }),
+            afterCursorChange(){
+                instance10?.redraw()
+            }
+        }
+    );
+    instance10 = NanoSheets(
+        document.getElementById("container10"),
+        {
+            data,
+            cellStyle: (x, y, value, selected)=>({
+                background:selected ? "#e2f7ff" :( instance9?.cursor[0]===x &&  instance9?.cursor[1]===y ?'rgb(0, 170, 225)':'white') ,
+                padding: "0 10px",
+                borderBottom: "1px solid #dadada",
+                borderRight: "1px solid #dadada",
+                transition: "background 0.1s",
+                color: "black",
+                outline: "none",
+                whiteSpace: "nowrap",
+            }),
+            afterCursorChange(){
+                instance9?.redraw()
+            },
+             inputStyle : {
+            border: "2px solid #6981ff",
+            font: "inherit",
+            borderRadius: "2px",
+            transition: "left 0.2s, top 0.2s",
+            padding: "0 8px",
+        },
+        }
+    );
+
+    instance9.select(1,2)
 
 
 </script>
